@@ -2,8 +2,6 @@ package br.com.jffw.cae.controllers.api;
 
 import java.util.List;
 
-import javax.persistence.EntityNotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +44,7 @@ public class ApiProprietarioController {
 	@PostMapping("/")
 	public ResponseEntity<?> incluirProprietario(@RequestBody ProprietarioDTO dto) {
 		try {
-			Proprietario proprietario = proprietarioService.incluirProprietario(dto);
+			ProprietarioListDTO proprietario = proprietarioService.incluirProprietario(dto);
 			return ResponseEntity.ok(proprietario);
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().body("Erro ao incluir proprietário: " + e.getMessage());
@@ -55,20 +53,21 @@ public class ApiProprietarioController {
 
 	@PutMapping("/{cpf}")
 	public ResponseEntity<?> alterarProprietario(@RequestBody ProprietarioDTO dto, @PathVariable String cpf) {
-		try {
-			ResponseEntity<?> response = proprietarioService.alterar(dto, cpf);
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body("Alteração realizada com sucesso");
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.toString());
-		}
+	    try {
+	        ResponseEntity<?> response = proprietarioService.alterar(dto, cpf);
+	        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Alteração realizada com sucesso");
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Erro ao alterar proprietário: " + e.getMessage());
+	    }
 	}
+
 
 	@DeleteMapping("/{cpf}")
 	public ResponseEntity<String> deleteProprietario(@PathVariable String cpf) {
 		try {
 			return new ResponseEntity<String>(proprietarioService.remover(cpf), HttpStatus.ACCEPTED);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.toString());
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Erro ao excluir proprietário: " + e.getMessage());
 		}
 	}
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.jffw.cae.dto.ApartamentoDTO;
 import br.com.jffw.cae.models.Apartamento;
+import br.com.jffw.cae.models.Usuario;
 import br.com.jffw.cae.repository.ApartamentoRepository;
 
 @Service
@@ -25,10 +26,11 @@ public class ApartamentoService {
 		return apartamentos;
 	}
 	
-	public ApartamentoDTO buscarApartamento(String id) {
-		Apartamento apartamento = apartamentoRepository.getReferenceById(Integer.parseInt(id));
+	public ApartamentoDTO buscarApartamento(String idApartamento) {
+		Apartamento apartamento = apartamentoRepository.findById(Integer.parseInt(idApartamento)).orElse(null);
+		
 		if (Optional.ofNullable(apartamento).isEmpty()){
-			throw new RuntimeException("Apartamento não localizado");
+			throw new NullPointerException("Apartamento não localizado.");
 		}
 		return new ApartamentoDTO(
 				apartamento.getId(), 
@@ -41,12 +43,16 @@ public class ApartamentoService {
 		String numero = dados.get("numero");
 		String bloco = dados.get("bloco");
 		int qndVagas = Integer.parseInt(dados.get("qndvagas"));
+		
+		if((numero.isBlank()) || (bloco.isBlank())) {
+			throw new NullPointerException("O numero e bloco devem ser informados.");
+		}			
 
 		
-		Apartamento ap = apartamentoRepository.findByNumero(numero);
+		Apartamento ap = apartamentoRepository.findByNumeroAndBloco(numero, bloco);
 		
 		if (!Optional.ofNullable(ap).isEmpty()){	
-			throw new RuntimeException("Este apartamento já existe");
+			throw new RuntimeException("Este apartamento [numero, bloco] já existe");
 		}		
 		
 		Apartamento apartamento = new Apartamento();
@@ -63,17 +69,23 @@ public class ApartamentoService {
 		String numero = dados.get("numero");
 		String bloco = dados.get("bloco");
 		int qndVagas = Integer.parseInt(dados.get("qndvagas"));
+		
+		if((numero.isBlank()) || (bloco.isBlank())) {
+			throw new NullPointerException("O numero e bloco devem ser informados.");
+		}			
 
-		Apartamento apartamento = apartamentoRepository.getReferenceById(Integer.parseInt(idApartamento));
+
+		Apartamento apartamento = apartamentoRepository.findById(Integer.parseInt(idApartamento)).orElse(null);
+		
 		if (Optional.ofNullable(apartamento).isEmpty()){
 			throw new RuntimeException("Apartamento não localizado");
 		}		
 		
-		if(!numero.equals(apartamento.getNumero())) {
-			Apartamento ap = apartamentoRepository.findByNumero(numero);
+		if(!numero.equals(apartamento.getNumero()) || !bloco.equals(apartamento.getBloco())) {
+			Apartamento ap = apartamentoRepository.findByNumeroAndBloco(numero, bloco);
 			
 			if (!Optional.ofNullable(ap).isEmpty()){	
-				throw new RuntimeException("Este número de apartamento já foi cadastrado.");
+				throw new RuntimeException("Este [número, bloco] de apartamento já foi cadastrado.");
 			}		
 		}
 		
@@ -88,6 +100,11 @@ public class ApartamentoService {
 	}
 
 	public String removerApartamento(String idApartamento) {
+		Apartamento apartamento = apartamentoRepository.findById(Integer.parseInt(idApartamento)).orElse(null);
+		
+		if (Optional.ofNullable(apartamento).isEmpty()){
+			throw new NullPointerException("Apartamento não localizado.");
+		}		
 		apartamentoRepository.deleteById(Integer.parseInt(idApartamento));
 		return"Apartamento removido com sucesso";
 	}

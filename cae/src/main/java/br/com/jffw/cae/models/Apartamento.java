@@ -33,7 +33,6 @@ public class Apartamento {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "apartamento")
     private List<Proprietario> proprietarios;    
   
-    
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "apartamento")
     private List<Vaga> vagas;
     
