@@ -30,7 +30,7 @@ public class ApiVeiculoController {
 		try {
 			return new ResponseEntity<Object>(veiculoService.incluirVeiculo(dados), HttpStatus.CREATED);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.toString());
+			return ResponseEntity.badRequest().body("Erro ao incluir veículo: " + e.getMessage());
 		}
 
 	}

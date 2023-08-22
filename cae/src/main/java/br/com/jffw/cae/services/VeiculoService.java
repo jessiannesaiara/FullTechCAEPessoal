@@ -1,5 +1,6 @@
 package br.com.jffw.cae.services;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import br.com.jffw.cae.dto.VagaVeiculosDTO;
 import br.com.jffw.cae.dto.VeiculoDTO;
+import br.com.jffw.cae.models.Proprietario;
 import br.com.jffw.cae.models.Vaga;
 import br.com.jffw.cae.models.Veiculo;
 import br.com.jffw.cae.repository.VagaRepository;
@@ -33,10 +35,16 @@ public class VeiculoService {
 	}
 		
 	
-	public VeiculoDTO incluirVeiculo(Map<String, String> dados) {
+	public VeiculoDTO incluirVeiculo(Map<String, String> dados) throws ParseException {
 		
 		int idvaga =  Integer.parseInt(dados.get("idvaga"));			
 		Vaga v =  vagaRepository.getReferenceById(idvaga);
+		String placa = dados.get("placa");
+		Veiculo existingVeiculo = veiculoRepository.findById(placa).orElse(null);
+		    if (existingVeiculo != null) {
+		        throw new IllegalArgumentException("O veículo já está cadastrado.");
+		    }
+
 		
 		// criando o objeto veiculo
 		Veiculo veiculo = new Veiculo();
