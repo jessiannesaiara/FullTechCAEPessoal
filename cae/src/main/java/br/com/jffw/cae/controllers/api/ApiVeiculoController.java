@@ -39,8 +39,7 @@ public class ApiVeiculoController {
 	public ResponseEntity<String> alterarVeiculo(@RequestBody Map<String, String> dados, @PathVariable String placa) {
 		try {
 
-			veiculoService.alterarVeiculo(dados, placa);
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body("Alteração realizada com sucesso");
+			return new ResponseEntity<String>(veiculoService.alterarVeiculo(dados, placa), HttpStatus.ACCEPTED);
 
 		} catch (Exception e) {
 
@@ -58,26 +57,26 @@ public class ApiVeiculoController {
 
 		} catch (Exception e) {
 
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.toString());
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
 
 		}
 
 	}
 	
+	@GetMapping("/")
+	public List<VagaVeiculosDTO> listarVeiculosDTO() {
+		return veiculoService.listarVeiculosDTO();
+	}
 
-
-	@GetMapping(path = { "/", "/{idVaga}" })
-	public List<VagaVeiculosDTO> listarVeiculos(@PathVariable(name = "idVaga", required = false) Integer idVaga) {
+	@GetMapping("/{placa}")
+	public ResponseEntity<?> listarVeiculosPorPlaca(@PathVariable String placa) {
 
 		try {
-			if (idVaga != null) {
-				return veiculoService.listarVeiculos(idVaga);
-			} else {
-				return veiculoService.listarVeiculos1();
-			}
-
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+			VagaVeiculosDTO dto = veiculoService.listarVeiculosPorPlaca(placa);
+				return ResponseEntity.ok(dto);
+			
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Veiculo não encontrado");
 		}
 
 	}
