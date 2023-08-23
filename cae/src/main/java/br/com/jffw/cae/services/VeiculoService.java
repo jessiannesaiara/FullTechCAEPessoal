@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import br.com.jffw.cae.dto.VagaVeiculosDTO;
 import br.com.jffw.cae.dto.VeiculoDTO;
-import br.com.jffw.cae.models.Proprietario;
 import br.com.jffw.cae.models.Vaga;
 import br.com.jffw.cae.models.Veiculo;
 import br.com.jffw.cae.repository.VagaRepository;
