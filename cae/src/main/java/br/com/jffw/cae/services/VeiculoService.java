@@ -4,16 +4,27 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+<<<<<<< HEAD
+=======
+import java.util.Optional;
+>>>>>>> 804433d87484860616f7c2bfc3ec9c03aceb9dea
 
 import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+<<<<<<< HEAD
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+=======
+>>>>>>> 804433d87484860616f7c2bfc3ec9c03aceb9dea
 import org.springframework.stereotype.Service;
 
 import br.com.jffw.cae.dto.VagaVeiculosDTO;
 import br.com.jffw.cae.dto.VeiculoDTO;
+<<<<<<< HEAD
+=======
+import br.com.jffw.cae.models.Proprietario;
+>>>>>>> 804433d87484860616f7c2bfc3ec9c03aceb9dea
 import br.com.jffw.cae.models.Vaga;
 import br.com.jffw.cae.models.Veiculo;
 import br.com.jffw.cae.repository.VagaRepository;
@@ -27,10 +38,17 @@ public class VeiculoService {
 	@Autowired
 	private VagaRepository vagaRepository;
 
+<<<<<<< HEAD
 //	public List<VagaVeiculoDTO > listarVeiculos(String id) {
 //		return veiculoRepository.getVagaVeiculoDTOById(id);
 //	}
 //	
+=======
+//    public List<VagaVeiculoDTO > listarVeiculos(String id) {
+//        return veiculoRepository.getVagaVeiculoDTOById(id);
+//    }
+//    
+>>>>>>> 804433d87484860616f7c2bfc3ec9c03aceb9dea
 
 	public List<Veiculo> listarVeiculos() {
 		return veiculoRepository.findAll();
@@ -38,16 +56,48 @@ public class VeiculoService {
 
 	public VeiculoDTO incluirVeiculo(Map<String, String> dados) throws ParseException {
 
+<<<<<<< HEAD
 		int idvaga = Integer.parseInt(dados.get("idvaga"));
 		Vaga v = vagaRepository.getReferenceById(idvaga);
 		String placa = dados.get("placa");
 		Veiculo existingVeiculo = veiculoRepository.findById(placa).orElse(null);
 		if (existingVeiculo != null) {
 			throw new IllegalArgumentException("O veículo já está cadastrado.");
+=======
+		String placa = dados.get("placa");
+		String cor = dados.get("cor");
+		String modelo = dados.get("modelo");
+		int idVaga = Integer.parseInt(dados.get("idVaga"));
+		
+	    Vaga existingVaga = vagaRepository.findById(idVaga).orElse(null);
+	    if (existingVaga == null) {
+	        throw new IllegalArgumentException("Vaga não localizada.");
+	    }
+	
+		if ((placa.isBlank()) || (cor.isBlank()) || (modelo.isBlank())) {
+			throw new NullPointerException("A placa, cor e modelo devem ser informados.");
+		}
+		
+		Veiculo vc = veiculoRepository.findByPlacaAndCorAndModelo(placa, cor, modelo);
+
+		if (!Optional.ofNullable(vc).isEmpty()) {
+			throw new RuntimeException("Este veiculo " + placa + " já existe");
+		}
+
+		List<Veiculo> veiculosdaVaga = existingVaga.getVeiculos();
+		if (!veiculosdaVaga.isEmpty()) {
+			throw new IllegalArgumentException("A vaga já está vinculada a outro veículo.");
+		}
+
+		Optional<Vaga> vagaOptional = vagaRepository.findById(idVaga);
+		if (!vagaOptional.isPresent()) {
+			throw new IllegalArgumentException("A vaga com o ID fornecido não existe.");
+>>>>>>> 804433d87484860616f7c2bfc3ec9c03aceb9dea
 		}
 
 		// criando o objeto veiculo
 		Veiculo veiculo = new Veiculo();
+<<<<<<< HEAD
 		veiculo.setVaga(v);
 		veiculo.setPlaca(dados.get("placa"));
 		veiculo.setCor(dados.get("cor"));
@@ -56,10 +106,21 @@ public class VeiculoService {
 		veiculoRepository.save(veiculo);
 
 		return new VeiculoDTO(idvaga, veiculo.getPlaca(), veiculo.getCor(), veiculo.getModelo());
+=======
+		veiculo.setVaga(existingVaga);
+		veiculo.setPlaca(placa);
+		veiculo.setCor(cor);
+		veiculo.setModelo(modelo);
+
+		veiculoRepository.save(veiculo);
+
+		return new VeiculoDTO(veiculo.getVaga().getId(), veiculo.getPlaca(), veiculo.getCor(), veiculo.getModelo());
+>>>>>>> 804433d87484860616f7c2bfc3ec9c03aceb9dea
 
 	}
 
 	public String alterarVeiculo(Map<String, String> dados, String placa) {
+<<<<<<< HEAD
 
 	
 
@@ -112,6 +173,45 @@ public class VeiculoService {
 //			        throw new IllegalArgumentException("O ID da vaga é obrigatório para a alteração.");
 //		
 //	}
+=======
+        Veiculo veiculo = veiculoRepository.findById(placa)
+                .orElseThrow(() -> new EntityNotFoundException("O veículo a ser alterado não existe."));
+
+		
+		String cor = dados.get("cor");
+		String modelo = dados.get("modelo");
+		int idVaga = Integer.parseInt(dados.get("idVaga"));
+
+//		Optional<Veiculo> veiculoOptional = veiculoRepository.findById(placa);
+//		if (!veiculoOptional.isPresent()) {
+//			throw new IllegalArgumentException("O veículo com a placa fornecida não existe.");
+//		}
+
+		Optional<Vaga> vagaOptional = vagaRepository.findById(idVaga);
+		if (!vagaOptional.isPresent()) {
+			throw new IllegalArgumentException("A vaga com o ID fornecido não existe.");
+		}
+
+		if (((cor.isBlank()) || (modelo.isBlank()))) {
+			throw new NullPointerException("A cor e modelo devem ser informados.");
+		}
+
+		
+        List<Veiculo> veiculosVinculados = veiculoRepository
+                .findByVagaAndNotPlaca(idVaga, placa);
+        if (!veiculosVinculados.isEmpty()) {
+            throw new IllegalArgumentException("A vaga já está vinculada a outro veículo.");
+        }
+		
+		veiculo.setCor(cor);
+		veiculo.setModelo(modelo);
+		veiculo.setVaga(vagaOptional.get());
+
+		veiculoRepository.save(veiculo);
+
+		return "Alteração realizada com sucesso!";
+	}
+>>>>>>> 804433d87484860616f7c2bfc3ec9c03aceb9dea
 
 	public String remover(String placa) {
 		try {
